@@ -578,6 +578,12 @@ class Play(object):
                                 last_task['register'] = x['register']
                             else:
                                 utils.warning("ignored 'register' key in task '%s'" % x)
+                        if 'ignore_errors' in x:
+                            for task in data:
+                                if 'ignore_errors' not in task:
+                                    task['ignore_errors'] = x['ignore_errors']
+                                elif task['ignore_errors'] != x['ignore_errors']:
+                                    utils.warning("'ignore_errors' key in task '%s' can not override task '%s'" % (x, task))
                     loaded = self._load_tasks(data, mv, default_vars, included_sudo_vars, list(included_additional_conditions), original_file=include_filename, role_name=new_role)
                     results += loaded
             elif type(x) == dict:
