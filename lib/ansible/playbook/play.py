@@ -571,6 +571,13 @@ class Play(object):
                         for x in data:
                             if 'include' in x:
                                 x['role_name'] = new_role
+                    if data:
+                        if 'register' in x:
+                            last_task = data[-1]
+                            if 'register' not in last_task:
+                                last_task['register'] = x['register']
+                            else:
+                                utils.warning("ignored 'register' key in task '%s'" % x)
                     loaded = self._load_tasks(data, mv, default_vars, included_sudo_vars, list(included_additional_conditions), original_file=include_filename, role_name=new_role)
                     results += loaded
             elif type(x) == dict:
