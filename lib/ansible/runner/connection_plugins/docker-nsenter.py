@@ -25,7 +25,7 @@ import subprocess
 from ansible import errors
 from ansible import utils
 from ansible.callbacks import vvv
-from ansible.constants import get_config, p as cfg
+from ansible.constants import get_config, p as cfg, DEFAULT_SUDO_EXE
 import docker
 
 class Connection(object):
@@ -78,7 +78,7 @@ class Connection(object):
 
         local_cmd = self._generate_cmd(cmd, sudo_user, sudoable, executable, su, su_user)
         if get_config(cfg, 'nsenter', 'sudo', None, True, boolean=True):
-            local_cmd = 'sudo %s' % local_cmd
+            local_cmd = '%s %s' % (DEFAULT_SUDO_EXE, local_cmd)
 
         vvv("EXEC %s" % (local_cmd), host=self.docker_id)
         p = subprocess.Popen(shlex.split(local_cmd), cwd=self.runner.basedir,
@@ -102,7 +102,7 @@ class Connection(object):
 
         local_cmd = [self.cmd, '--mount', '--uts', '--ipc', '--net', '--pid', '--target', str(self.pid), '--', 'tee', out_path]
         if get_config(cfg, 'nsenter', 'sudo', None, True, boolean=True):
-            local_cmd.insert(0, 'sudo')
+            local_cmd.insert(0, DEFAULT_SUDO_EXE)
         vvv("EXEC %s" % (local_cmd), host=self.docker_id)
 
         p = subprocess.Popen(local_cmd, cwd=self.runner.basedir,
@@ -118,7 +118,7 @@ class Connection(object):
 
         local_cmd = [self.cmd, '--mount', '--uts', '--ipc', '--net', '--pid', '--target', str(self.pid), '--', 'cat', in_path]
         if get_config(cfg, 'nsenter', 'sudo', None, True, boolean=True):
-            local_cmd.insert(0, 'sudo')
+            local_cmd.insert(0, DEFAULT_SUDO_EXE)
         vvv("EXEC %s" % (local_cmd), host=self.docker_id)
 
         p = subprocess.Popen(local_cmd, cwd=self.runner.basedir,
