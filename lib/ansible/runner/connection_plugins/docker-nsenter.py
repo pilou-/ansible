@@ -20,6 +20,7 @@
 import distutils.spawn
 import os
 import pipes
+import shlex
 import subprocess
 from ansible import errors
 from ansible import utils
@@ -80,8 +81,7 @@ class Connection(object):
             local_cmd = 'sudo %s' % local_cmd
 
         vvv("EXEC %s" % (local_cmd), host=self.docker_id)
-        p = subprocess.Popen(local_cmd, shell=not executable,
-                             cwd=self.runner.basedir,
+        p = subprocess.Popen(shlex.split(local_cmd), cwd=self.runner.basedir,
                              stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
