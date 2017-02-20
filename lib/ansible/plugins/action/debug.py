@@ -55,11 +55,9 @@ class ActionModule(ActionBase):
             elif 'var' in self._task.args:
                 results = self._templar.template(self._task.args['var'], convert_bare=True, fail_on_undefined=True, bare_deprecated=False)
                 if results == self._task.args['var']:
-                    # if results is not str/unicode type, raise an exception
-                    if not isinstance(results, string_types):
-                        raise AnsibleUndefinedVariable
                     # If var name is same as result, try to template it
-                    results = self._templar.template("{{" + results + "}}", convert_bare=True, fail_on_undefined=True)
+                    if isinstance(results, string_types):
+                        results = self._templar.template("{{" + results + "}}", convert_bare=True, fail_on_undefined=True)
 
                 if isinstance(self._task.args['var'], (list, dict)):
                     # If var is a list or dict, use the type as key to display
