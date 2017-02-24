@@ -18,7 +18,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible.compat.six import string_types
 from ansible.module_utils._text import to_text
 from ansible.plugins.action import ActionBase
 
@@ -53,10 +52,9 @@ class ActionModule(ActionBase):
 
             elif 'var' in self._task.args:
                 results = self._templar.template(self._task.args['var'], convert_bare=True, fail_on_undefined=True, bare_deprecated=False)
-                if results == self._task.args['var']:
-                    # If var name is same as result, try to template it
-                    if isinstance(results, string_types):
-                        results = self._templar.template('{{' + results + '}}', convert_bare=True, fail_on_undefined=True)
+                # Undefined bare variables are returned unchanged
+                if results == self._task.args['var'] == self._templar._convert_bare_variable(results, True):
+                    return {"failed": True, "msg": "Unknown variable name '%s'" % results}
 
                 if isinstance(self._task.args['var'], (list, dict)):
                     # If var is a list or dict, use the type as key to display
