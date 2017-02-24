@@ -68,11 +68,11 @@ EXAMPLES = '''
   register: result
 
 - debug:
-    var: result
+    var: "{{ result }}
     verbosity: 2
 
 - name: Display all variables/facts known for a host
   debug:
-    var: hostvars[inventory_hostname]
+    var: "{{ hostvars[inventory_hostname] }}"
     verbosity: 4
 '''
