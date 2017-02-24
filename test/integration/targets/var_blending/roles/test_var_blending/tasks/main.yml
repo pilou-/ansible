@@ -42,8 +42,17 @@
     that:
       - same_value_as_var_name.same_value_as_var_name_var == 'same_value_as_var_name_var'
 
+- name: check task failed when bare variable is undefined
+  debug: var=undefined_bare_variable
+  register: var_bare_undefined
+  ignore_errors: true
+
+- assert:
+    that:
+      - 'var_bare_undefined|failed'
+
 - name: check task failed when variable is undefined
-  debug: var=undefined_variable
+  debug: 'var={{ undefined_variable }}'
   register: var_undefined
   ignore_errors: true
 
