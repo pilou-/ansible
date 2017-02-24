@@ -30,6 +30,8 @@ description:
      - This module prints statements during execution and can be useful
        for debugging variables or expressions without necessarily halting
        the playbook. Useful for debugging together with the 'when:' directive.
+       This task will fail if a template error occurs or an undefined variable
+       is used.
 
 version_added: "0.8"
 options:
