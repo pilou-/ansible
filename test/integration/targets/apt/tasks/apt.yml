@@ -123,28 +123,26 @@
 - name: uninstall hello with apt
   apt: pkg=hello state=absent purge=yes
 
-- name: install deb file
-  apt: deb="/var/cache/apt/archives/hello_{{ hello_version.stdout }}_{{ hello_architecture.stdout }}.deb"
-  register: apt_initial
+- include: deb.yml
 
-- name: install deb file again
-  apt: deb="/var/cache/apt/archives/hello_{{ hello_version.stdout }}_{{ hello_architecture.stdout }}.deb"
-  register: apt_secondary
+- name: List foreign architectures
+  command: dpkg --print-foreign-architectures
+  register: foreign_arch
 
-- name: verify installation of hello
-  assert:
-    that:
-        - "apt_initial.changed"
-        - "not apt_secondary.changed"
+- block:
+    - name: List current architecture
+      command: dpkg --print-architecture
+      register: dpkg_arch
 
-- name: uninstall hello with apt
-  apt: pkg=hello state=absent purge=yes
+    - name: Enable another architecture
+      command: 'dpkg --add-architecture {{ foreign_arch[dpkg_arch.stdout]|default(default_foreign_arch) }}'
 
-- name: force install of deb
-  apt: deb="/var/cache/apt/archives/hello_{{ hello_version.stdout }}_{{ hello_architecture.stdout }}.deb" force=true
-  register: dpkg_force
+    - name: Take in account new architecture
+      apt:
+        update_cache: yes
 
-- name: verify installation of hello
-  assert:
-    that:
-        - "dpkg_force.changed"
+    - include: deb.yml
+  always:
+    - name: Disable foreign architecture
+      command: 'dpkg --remove-architecture {{ foreign_arch[dpkg_arch.stdout]|default(default_foreign_arch) }}'
+  when: not foreign_arch.stdout
