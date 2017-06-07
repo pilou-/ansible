@@ -25,7 +25,7 @@ from ansible.compat.tests import unittest
 from ansible.compat.tests.mock import patch
 
 from ansible.inventory.manager import InventoryManager, split_host_pattern
-from ansible.vars.manager import VariableManager
+from ansible.utils.path import unfrackpath
 
 from units.mock.loader import DictDataLoader
 
@@ -112,15 +112,18 @@ class TestInventory(unittest.TestCase):
 class InventoryDefaultGroup(unittest.TestCase):
 
     def test_empty_inventory(self):
-        inventory = self._get_inventory('')
+        inventory = self._get_inventory('', '')
 
         self.assertIn('all', inventory.groups)
         self.assertIn('ungrouped', inventory.groups)
         self.assertFalse(inventory.groups['all'].get_hosts())
         self.assertFalse(inventory.groups['ungrouped'].get_hosts())
 
-    def test_ini(self):
-        self._test_default_groups("""
+    @patch('ansible.plugins.inventory.BaseInventoryPlugin.verify_file')
+    def test_ini(self, verify_file):
+        verify_file.return_value = True
+        inventory_path = unfrackpath('hosts')
+        self._test_default_groups(inventory_path, """
             host1
             host2
             host3
@@ -130,8 +133,11 @@ class InventoryDefaultGroup(unittest.TestCase):
             host5
             """)
 
-    def test_ini_explicit_ungrouped(self):
-        self._test_default_groups("""
+    @patch('ansible.plugins.inventory.BaseInventoryPlugin.verify_file')
+    def test_ini_explicit_ungrouped(self, verify_file):
+        verify_file.return_value = True
+        inventory_path = unfrackpath('hosts')
+        self._test_default_groups(inventory_path, """
             [ungrouped]
             host1
             host2
@@ -142,14 +148,49 @@ class InventoryDefaultGroup(unittest.TestCase):
             host5
             """)
 
-    def _get_inventory(self, inventory_content):
+    @patch('ansible.plugins.inventory.BaseInventoryPlugin.verify_file')
+    def test_yaml(self, verify_file):
+        verify_file.return_value = True
+        inventory_path = unfrackpath('hosts.yaml')
+        self._test_default_groups(inventory_path, """
+            ungrouped:
+              hosts:
+                host1:
+                host2:
+                host3:
+            servers:
+              hosts:
+                host3:
+                host4:
+                host5:
+        """)
 
-        fake_loader = DictDataLoader({__file__: inventory_content})
+    @patch('ansible.plugins.inventory.BaseInventoryPlugin.verify_file')
+    def test_yaml_full_form(self, verify_file):
+        verify_file.return_value = True
+        inventory_path = unfrackpath('hosts.yaml')
+        self._test_default_groups(inventory_path, """
+            all:
+              hosts:
+                host1:
+                host2:
+                host3:
+              children:
+                servers:
+                  hosts:
+                    host3:
+                    host4:
+                    host5:
+        """)
 
-        return InventoryManager(loader=fake_loader, sources=[__file__])
+    def _get_inventory(self, filename, inventory_content):
 
-    def _test_default_groups(self, inventory_content):
-        inventory = self._get_inventory(inventory_content)
+        fake_loader = DictDataLoader({filename: inventory_content})
+
+        return InventoryManager(loader=fake_loader, sources=[filename])
+
+    def _test_default_groups(self, filename, inventory_content):
+        inventory = self._get_inventory(filename, inventory_content)
 
         self.assertIn('all', inventory.groups)
         self.assertIn('ungrouped', inventory.groups)
