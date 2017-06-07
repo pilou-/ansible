@@ -149,6 +149,35 @@ class InventoryDefaultGroup(unittest.TestCase):
             host5
             """)
 
+    def test_yaml(self):
+        self._test_default_groups("""
+            ungrouped:
+              hosts:
+                host1:
+                host2:
+                host3:
+            servers:
+              hosts:
+                host3:
+                host4:
+                host5:
+            """)
+
+    def test_yaml_full_form(self):
+        self._test_default_groups("""
+            all:
+              hosts:
+                host1:
+                host2:
+                host3:
+              children:
+                servers:
+                  hosts:
+                    host3:
+                    host4:
+                    host5:
+        """)
+
     def _get_inventory(self, inventory_content):
         v = VariableManager()
 
