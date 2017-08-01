@@ -181,11 +181,11 @@ class PrivateKey(crypto_utils.OpenSSLObject):
                                           os.O_WRONLY | os.O_CREAT | os.O_TRUNC,
                                           self.mode)
 
-                extras = {}
                 if self.cipher and self.passphrase:
-                    extras = {'cipher': self.cipher, 'passphrase': self.passphrase}
-
-                os.write(privatekey_file, crypto.dump_privatekey(crypto.FILETYPE_PEM, self.privatekey, **extras))
+                    os.write(privatekey_file, crypto.dump_privatekey(crypto.FILETYPE_PEM, self.privatekey,
+                                                                     self.cipher, self.passphrase.encode('UTF-8')))
+                else:
+                    os.write(privatekey_file, crypto.dump_privatekey(crypto.FILETYPE_PEM, self.privatekey))
                 os.close(privatekey_file)
                 self.changed = True
             except IOError as exc:

@@ -26,3 +26,31 @@
   assert:
     that:
       - privatekey1.stdout == '4096'
+
+
+- name: Validate privatekey4 (test)
+  stat:
+    path: '{{ output_dir }}/privatekey4.pem'
+  register: privatekey4
+
+- name: Validate privatekey4 (assert)
+  assert:
+    that:
+      - privatekey4.stat.exists == False
+
+
+- name: Validate privatekey5 (test)
+  shell: "openssl rsa -noout -text -in {{ output_dir }}/privatekey5.pem -passin pass:ansible  | grep Private | sed 's/Private-Key: (\\(.*\\) bit)/\\1/'"
+  register: privatekey5
+  when: not ansible_os_family == 'Darwin'
+
+- name: Validate privatekey5 (assert)
+  assert:
+    that:
+      - privatekey5.stdout == '4096'
+  when: not ansible_os_family == 'Darwin'
+
+- name: Validate privatekey5 idemptotence (assert)
+  assert:
+    that:
+      - not privatekey5_idempotence|changed

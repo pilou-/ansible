@@ -63,7 +63,7 @@ def load_privatekey(path, passphrase=None):
         if passphrase:
             privatekey = crypto.load_privatekey(crypto.FILETYPE_PEM,
                                                 open(path, 'rb').read(),
-                                                passphrase)
+                                                passphrase.encode('UTF-8'))
         else:
             privatekey = crypto.load_privatekey(crypto.FILETYPE_PEM,
                                                 open(path, 'rb').read())
