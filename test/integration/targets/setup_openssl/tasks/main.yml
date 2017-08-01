@@ -23,3 +23,7 @@
 - name: register openssl version
   command: python -c 'import OpenSSL; print(OpenSSL.__version__)'
   register: pyopenssl_version
+
+- name: register cryptography version
+  command: python -c 'import cryptography; print(cryptography.__version__)'
+  register: cryptography_version
