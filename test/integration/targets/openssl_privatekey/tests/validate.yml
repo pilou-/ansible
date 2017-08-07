@@ -54,3 +54,15 @@
   assert:
     that:
       - not privatekey5_idempotence|changed
+
+
+- name: Validate privatekey6 (test)
+  stat:
+    path: '{{ output_dir }}/privatekey6.pem'
+  register: privatekey6
+
+- name: Validate privatekey6 (assert)
+  assert:
+    that:
+      - privatekey6.stat.exists
+      - privatekey6.stat.isfile

@@ -34,4 +34,10 @@
     cipher: aes256
   register: privatekey5_idempotence
 
+- name: Generate privatekey6 - standard - with non-ASCII passphrase
+  openssl_privatekey:
+    path: '{{ output_dir }}/privatekey6.pem'
+    passphrase: ànsïblé
+    cipher: aes256
+
 - import_tasks: ../tests/validate.yml
