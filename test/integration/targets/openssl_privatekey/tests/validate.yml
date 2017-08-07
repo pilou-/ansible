@@ -25,7 +25,7 @@
 - name: Validate privatekey3 (assert)
   assert:
     that:
-      - privatekey1.stdout == '4096'
+      - privatekey3.stdout == '4096'
 
 
 - name: Validate privatekey4 (test)
@@ -50,7 +50,7 @@
       - privatekey5.stdout == '4096'
   when: not ansible_os_family == 'Darwin'
 
-- name: Validate privatekey5 idemptotence (assert)
+- name: Validate privatekey5 idempotence (assert)
   assert:
     that:
       - not privatekey5_idempotence|changed
