@@ -218,6 +218,10 @@
     - 'yes'
     - 'no'
 
+# Create a role with a dot
+- include: test_role_with_dot.yml
+
+
 ### TODO: fail_on_user
 
 #

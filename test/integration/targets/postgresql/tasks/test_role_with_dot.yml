@@ -1,0 +1,50 @@
+- vars:
+    name_with_dot: 'role.name'
+
+  block:
+  - name: Create a role with dot in it
+    become_user: "{{ pg_user }}"
+    become: True
+    postgresql_user:
+      name: "{{ name_with_dot }}"
+      login_user: "{{ pg_user }}"
+      db: postgres
+    register: result
+
+  - name: assert that module reports user was created
+    assert:
+      that:
+         - "result|changed"
+         - "result|success"
+
+  - name: Create a role with dot in it (again)
+    become_user: "{{ pg_user }}"
+    become: True
+    postgresql_user:
+      name: "{{ name_with_dot }}"
+      login_user: "{{ pg_user }}"
+      db: postgres
+    register: result
+
+  - name: assert that module reports no change
+    assert:
+      that:
+         - "not result|changed"
+         - "result|success"
+
+  always:
+  - name: Cleanup test user
+    become_user: "{{ pg_user }}"
+    become: True
+    postgresql_user:
+      name: "{{ name_with_dot }}"
+      state: 'absent'
+      login_user: "{{ pg_user }}"
+      db: postgres
+    register: result
+
+  - name: assert that module reports user was deleted
+    assert:
+      that:
+         - "result|changed"
+         - "result|success"
