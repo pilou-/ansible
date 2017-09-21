@@ -74,9 +74,8 @@ class InventoryModule(BaseFileInventoryPlugin):
     def verify_file(self, path):
 
         valid = False
-        b_path = to_bytes(path)
-        if super(InventoryModule, self).verify_file(b_path):
-            file_name, ext = os.path.splitext(b_path)
+        if super(InventoryModule, self).verify_file(path):
+            file_name, ext = os.path.splitext(path)
             if ext and ext in C.YAML_FILENAME_EXTENSIONS:
                 valid = True
         return valid
