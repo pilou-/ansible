@@ -4,3 +4,4 @@
     dest: '{{ output_dir }}'
     remote_src: yes
     creates: '{{ output_dir }}/{{ nodejs_path }}.tar.gz'
+    validate_certs: False # get_url is broken, see #33580
