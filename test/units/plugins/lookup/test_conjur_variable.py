@@ -21,17 +21,15 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-from ansible.module_utils.basic import AnsibleModule
-from ansible.compat.tests import unittest
+import pytest
+import tempfile
 # from ansible.module_utils.urls import open_url
 # from ansible.compat.tests.mock import mock_open, patch
 from ansible.errors import AnsibleError
-from ansible.plugins.loader import PluginLoader
 from ansible.plugins.lookup import conjur_variable
-import tempfile
 
 
-class TestLookupModule(unittest.TestCase):
+class TestLookupModule:
     def test_valid_netrc_file(self):
         with tempfile.NamedTemporaryFile() as temp_netrc:
             temp_netrc.write(b"machine http://localhost/authn\n")
@@ -41,8 +39,8 @@ class TestLookupModule(unittest.TestCase):
 
             results = conjur_variable._load_identity_from_file(temp_netrc.name, 'http://localhost')
 
-            self.assertEquals(results['id'], 'admin')
-            self.assertEquals(results['api_key'], 'my-pass')
+        assert results['id'] == 'admin'
+        assert results['api_key'] == 'my-pass'
 
     def test_netrc_without_host_file(self):
         with tempfile.NamedTemporaryFile() as temp_netrc:
@@ -51,7 +49,7 @@ class TestLookupModule(unittest.TestCase):
             temp_netrc.write(b"  password my-pass\n")
             temp_netrc.seek(0)
 
-            with self.assertRaises(AnsibleError):
+            with pytest.raises(AnsibleError, message='Expecting AnsibleError: netrc file does not contain an entry for "foo"'):
                 conjur_variable._load_identity_from_file(temp_netrc.name, 'http://foo')
 
     def test_valid_configuration(self):
@@ -63,8 +61,9 @@ class TestLookupModule(unittest.TestCase):
             configuration_file.seek(0)
 
             results = conjur_variable._load_conf_from_file(configuration_file.name)
-            self.assertEquals(results['account'], 'demo-policy')
-            self.assertEquals(results['appliance_url'], 'http://localhost:8080')
+
+        assert results['account'] == 'demo-policy'
+        assert results['appliance_url'] == 'http://localhost:8080'
 
     # This test fails do to missing patch :(
     # @patch('ansible.plugins.lookup.conjur_variable.open_url')
