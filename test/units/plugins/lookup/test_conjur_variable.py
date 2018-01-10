@@ -23,9 +23,9 @@ __metaclass__ = type
 
 import pytest
 import tempfile
-# from ansible.module_utils.urls import open_url
-# from ansible.compat.tests.mock import mock_open, patch
+from ansible.compat.tests.mock import MagicMock
 from ansible.errors import AnsibleError
+from ansible.module_utils.six.moves import http_client
 from ansible.plugins.lookup import conjur_variable
 
 
@@ -65,14 +65,20 @@ class TestLookupModule:
         assert results['account'] == 'demo-policy'
         assert results['appliance_url'] == 'http://localhost:8080'
 
-    # This test fails do to missing patch :(
-    # @patch('ansible.plugins.lookup.conjur_variable.open_url')
-    # def test_token_retrieval():
-    #     stream = open_url.return_value
-    #     stream.read.return_value = "foo-bar-token"
-    #     stream.getcode.return_value = 200
-    #     open_url.return_value = stream
-    #
-    #     response = conjur_variable._fetch_conjur_token('http://conjur', 'account', 'username', 'api_key')
-    #
-    #     self.assertEqual(stream.read.return_value, response)
+    def test_token_retrieval(self, mocker):
+        mock_response = MagicMock(spec_set=http_client.HTTPResponse)
+        mock_response.read.return_value = "foo-bar-token"
+        mock_response.getcode.return_value = 200
+        mock_open_url = mocker.patch.object(conjur_variable, 'open_url', return_value=mock_response)
+
+        response = conjur_variable._fetch_conjur_token('http://conjur', 'account', 'username', 'api_key')
+
+        assert "foo-bar-token" == response
+
+    def test_token_retrieval_error(self, mocker):
+        mock_response = MagicMock(spec_set=http_client.HTTPResponse)
+        mock_response.getcode.return_value = 403
+        mock_open_url = mocker.patch.object(conjur_variable, 'open_url', return_value=mock_response)
+
+        with pytest.raises(AnsibleError, message='HTTP return code different than 200 must raise an error'):
+            conjur_variable._fetch_conjur_token('http://conjur', 'account', 'username', 'api_key')
