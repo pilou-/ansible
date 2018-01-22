@@ -4,3 +4,6 @@
     dest: '{{ output_dir }}'
     remote_src: yes
     creates: '{{ output_dir }}/{{ nodejs_path }}.tar.gz'
+  register: result_unarchive
+  # default value for 'retries' is 3 and 'delay' is 5s
+  until: result_unarchive is success
