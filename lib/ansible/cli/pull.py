@@ -44,7 +44,7 @@ except ImportError:
 ########################################################
 
 class PullCLI(CLI):
-    ''' is used to up a remote copy of ansible on each managed node,
+    ''' is used to pull up a remote copy of ansible on each managed node,
         each set to run via cron and update playbook source via a source repository.
         This inverts the default *push* architecture of ansible into a *pull* architecture,
         which has near-limitless scaling potential.
