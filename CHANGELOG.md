@@ -1194,7 +1194,7 @@ While neither network_cli nor netconf are technically new plugins, these connect
 
 <a id="2.3.3"></a>
 
-## 2.3.3 "Ramble On" - TBD
+## 2.3.3 "Ramble On" - 2017-12-20
 
 ### Bugfixes
 * Fix alternatives module handlling of non existing options
