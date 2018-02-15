@@ -1100,7 +1100,7 @@ Ansible Changes By Release
 
 <a id="2.3.3"></a>
 
-## 2.3.3 "Ramble On" - TBD
+## 2.3.3 "Ramble On" - 2017-12-20
 
 ### Bugfixes
 * Fix alternatives module handlling of non existing options
