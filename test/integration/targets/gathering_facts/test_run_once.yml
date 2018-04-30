@@ -1,0 +1,24 @@
+---
+- hosts: facthost1
+  gather_facts: no
+  tasks:
+    - name: install test local facts
+      copy:
+        src: counter.fact
+        dest: /etc/ansible/facts.d/
+        mode: 0755
+
+- hosts: facthost1,facthost2
+  gather_facts: yes
+  run_once: yes
+  tasks:
+    - block:
+      - name: "Check that run_once doesn't prevent fact gathering (#39453)"
+        assert:
+          that: 'hostvars.facthost1.ansible_local.counter != hostvars.facthost2.ansible_local.counter'
+          msg: "{{ 'Same value for ansible_local.counter on both hosts: ' ~ hostvars.facthost1.ansible_local.counter }}"
+      always:
+        - name: remove test local facts
+          file:
+            path: /etc/ansible/facts.d/counter.fact
+            state: absent

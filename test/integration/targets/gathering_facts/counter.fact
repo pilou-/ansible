@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
+import json
+import os.path
+import tempfile
+
+
+count_path = os.path.join(tempfile.gettempdir(), 'ansible_test_count')
+
+if os.path.exists(count_path):
+    with open(count_path, mode='r') as fd:
+        value = fd.readline()
+        value = int(value)
+else:
+    value = 0
+
+value += 1
+with open(count_path, mode='w') as fd:
+    fd.write(str(value))
+
+print(json.dumps(value))
