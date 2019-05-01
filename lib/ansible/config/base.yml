@@ -1042,16 +1042,6 @@ DEFAULT_SFTP_BATCH_MODE:
   - {key: sftp_batch_mode, section: ssh_connection}
   type: boolean
   yaml: {key: ssh_connection.sftp_batch_mode}
-DEFAULT_SSH_TRANSFER_METHOD:
-  # TODO: move to ssh plugin
-  default:
-  description: 'unused?'
-  #  - "Preferred method to use when transferring files over ssh"
-  #  - Setting to smart will try them until one succeeds or they all fail
-  #choices: ['sftp', 'scp', 'dd', 'smart']
-  env: [{name: ANSIBLE_SSH_TRANSFER_METHOD}]
-  ini:
-  - {key: transfer_method, section: ssh_connection}
 DEFAULT_STDOUT_CALLBACK:
   name: Main display callback plugin
   default: default
